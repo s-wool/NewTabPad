@@ -85,10 +85,12 @@
 | 操作 | macOS | Windows / Linux |
 |---|---|---|
 | 新規メモ作成 | `Cmd + Shift + Enter` | `Ctrl + Shift + Enter` |
-| メモ一覧表示 | `Cmd + Shift + L` | `Ctrl + Shift + L` |
+| メモ一覧表示 | `Cmd + Shift + K` | `Ctrl + Shift + K` |
 | 一覧からエディタへ戻る | `Esc` | `Esc` |
 
 これらは Chrome 標準ショートカットと衝突しないよう選定済み。**変更する際は同じレベルの検討（Chrome 標準との衝突確認、AltGr 衝突懸念など）が必要**。
+
+実装上の注意: `Ctrl+Shift+L` は Chrome が内部で横取りするため、新しいタブページではページの JavaScript に届かない（`Ctrl+L` のアドレスバー系ショートカットの派生として Chrome が消費する）。このキーは使わないこと。
 
 ## ファイル構成
 
