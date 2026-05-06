@@ -1,18 +1,30 @@
 import { isEmpty } from './utils.js';
 
 const DEBOUNCE_MS = 500;
+const TEXTAREA_H_PADDING = 32; // left (16px) + right (16px) from CSS
 
 let textareaEl;
 let gutterContentEl;
 let onSaveCb;
 let onDeleteCb;
+let charWidth = 0;
+let lastGutterHtml = '';
 
 let currentNote = null;
 let currentPersisted = false;
 let isComposing = false;
 let pendingValue = null;
 let debounceTimer = null;
-let lastLineCount = 0;
+
+function measureCharWidth() {
+  const style = getComputedStyle(textareaEl);
+  const span = document.createElement('span');
+  span.style.cssText = `visibility:hidden;position:absolute;white-space:pre;font-family:${style.fontFamily};font-size:${style.fontSize};`;
+  span.textContent = 'x'.repeat(20);
+  document.body.appendChild(span);
+  charWidth = span.getBoundingClientRect().width / 20;
+  span.remove();
+}
 
 export function initEditor({ textarea, gutterContent, onSave, onDelete }) {
   textareaEl = textarea;
@@ -21,11 +33,7 @@ export function initEditor({ textarea, gutterContent, onSave, onDelete }) {
   onDeleteCb = onDelete;
 
   textareaEl.addEventListener('input', handleInput);
-
-  textareaEl.addEventListener('compositionstart', () => {
-    isComposing = true;
-  });
-
+  textareaEl.addEventListener('compositionstart', () => { isComposing = true; });
   textareaEl.addEventListener('compositionend', () => {
     isComposing = false;
     if (pendingValue !== null) {
@@ -34,11 +42,12 @@ export function initEditor({ textarea, gutterContent, onSave, onDelete }) {
       applyValue(v);
     }
   });
-
   textareaEl.addEventListener('scroll', () => {
     gutterContentEl.style.transform = `translateY(${-textareaEl.scrollTop}px)`;
   });
+  window.addEventListener('resize', refreshGutter);
 
+  measureCharWidth();
   refreshGutter();
 }
 
@@ -143,11 +152,18 @@ async function flushNow() {
 }
 
 function refreshGutter() {
-  const count = (textareaEl.value.match(/\n/g) ?? []).length + 1;
-  if (count === lastLineCount) return;
-  lastLineCount = count;
+  const lines = textareaEl.value.split('\n');
+  const visibleCols = charWidth > 0
+    ? Math.floor((textareaEl.clientWidth - TEXTAREA_H_PADDING) / charWidth)
+    : Infinity;
 
   let html = '';
-  for (let i = 1; i <= count; i++) html += `<div>${i}</div>`;
+  for (let i = 0; i < lines.length; i++) {
+    const marker = lines[i].length > visibleCols ? '›' : '';
+    html += `<div data-long="${marker}"><span class="num">${i + 1}</span></div>`;
+  }
+
+  if (html === lastGutterHtml) return;
+  lastGutterHtml = html;
   gutterContentEl.innerHTML = html;
 }

@@ -70,7 +70,7 @@ main {
 
 #gutter {
   flex: 0 0 auto;
-  width: calc(5ch + 28px);
+  width: calc(6ch + 28px);
   padding: 12px 10px 12px 12px;
   background: #f5f5f3;
   border-right: 1px solid #e8e8e4;
@@ -81,11 +81,27 @@ main {
   font-size: 14px;
   line-height: 1.6;
   color: #b0b0a8;
-  text-align: right;
 }
 
 #gutterContent {
   will-change: transform;
+}
+
+#gutterContent > div {
+  display: flex;
+  align-items: baseline;
+}
+
+#gutterContent > div::before {
+  content: attr(data-long);
+  min-width: 1ch;
+  flex-shrink: 0;
+  color: #c8a060;
+}
+
+.num {
+  flex: 1;
+  text-align: right;
 }
 
 #editor {
