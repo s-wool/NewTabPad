@@ -33,3 +33,6 @@ pnpm-lock.yaml
 *.crx
 *.pem
 *.zip
+
+# Windows download metadata
+*.Zone.Identifier
