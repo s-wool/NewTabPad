@@ -89,7 +89,7 @@ async function handleListOpen(noteId) {
 }
 
 async function handleListDelete(noteId) {
-  if (!confirm('このメモを削除しますか？')) return;
+  if (!confirm('Delete this note?')) return;
 
   const wasCurrent = getCurrentNoteId() === noteId;
   delete notesCache[noteId];

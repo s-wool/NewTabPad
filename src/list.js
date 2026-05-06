@@ -69,7 +69,7 @@ function render(notes) {
     const delBtn = document.createElement('button');
     delBtn.type = 'button';
     delBtn.className = 'noteDelete';
-    delBtn.textContent = '削除';
+    delBtn.textContent = 'Delete';
     delBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       onDeleteCb(note.id);
