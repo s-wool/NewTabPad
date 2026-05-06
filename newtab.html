@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>NewTabPad</title>
+  <link rel="stylesheet" href="styles/newtab.css">
+</head>
+<body>
+  <header id="appHeader">
+    <button id="newBtn" type="button">新規</button>
+    <button id="listBtn" type="button">一覧</button>
+  </header>
+  <main>
+    <div id="editorView" class="view">
+      <div id="gutter">
+        <div id="gutterContent"></div>
+      </div>
+      <textarea id="editor" wrap="off" spellcheck="false" autocomplete="off"></textarea>
+    </div>
+    <div id="listView" class="view" hidden>
+      <ul id="noteList"></ul>
+      <p id="emptyState" hidden>メモがありません</p>
+    </div>
+  </main>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

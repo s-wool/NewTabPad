@@ -1,0 +1,174 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  background: #fafafa;
+  color: #333;
+}
+
+/* ── Header ── */
+
+#appHeader {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f0f0ee;
+  border-bottom: 1px solid #e0e0dd;
+}
+
+#appHeader button {
+  font-size: 13px;
+  padding: 4px 14px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #444;
+  line-height: 1.4;
+}
+
+#appHeader button:hover {
+  background: #f5f5f3;
+  border-color: #bbb;
+}
+
+/* ── Layout ── */
+
+main {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.view {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.view[hidden] {
+  display: none;
+}
+
+/* ── Editor ── */
+
+#editorView {
+  flex-direction: row;
+  background: #fff;
+}
+
+#gutter {
+  flex: 0 0 auto;
+  width: calc(5ch + 28px);
+  padding: 12px 10px 12px 12px;
+  background: #f5f5f3;
+  border-right: 1px solid #e8e8e4;
+  overflow: hidden;
+  user-select: none;
+  pointer-events: none;
+  font-family: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #b0b0a8;
+  text-align: right;
+}
+
+#gutterContent {
+  will-change: transform;
+}
+
+#editor {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  outline: none;
+  resize: none;
+  font-family: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #222;
+  background: #fff;
+  overflow: auto;
+}
+
+/* ── List ── */
+
+#listView {
+  flex-direction: column;
+  background: #fff;
+  overflow-y: auto;
+}
+
+#noteList {
+  list-style: none;
+}
+
+.noteItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #eeeeeb;
+  cursor: default;
+}
+
+.noteItem:hover {
+  background: #f7f7f5;
+}
+
+.noteMain {
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.noteMeta {
+  font-size: 11px;
+  color: #999;
+  margin-bottom: 3px;
+  font-variant-numeric: tabular-nums;
+}
+
+.notePreview {
+  font-family: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-size: 13px;
+  color: #444;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.noteDelete {
+  flex: 0 0 auto;
+  font-size: 12px;
+  padding: 4px 10px;
+  background: #fff;
+  border: 1px solid #ddc8c8;
+  border-radius: 4px;
+  color: #a06060;
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.noteDelete:hover {
+  background: #fff0f0;
+  border-color: #cc9999;
+}
+
+#emptyState {
+  padding: 48px 20px;
+  text-align: center;
+  color: #aaa;
+  font-size: 14px;
+}
