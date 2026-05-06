@@ -7,7 +7,7 @@ let textareaEl;
 let gutterContentEl;
 let onSaveCb;
 let onDeleteCb;
-let charWidth = 0;
+let canvasCtx = null;
 let lastGutterHtml = '';
 
 let currentNote = null;
@@ -16,14 +16,10 @@ let isComposing = false;
 let pendingValue = null;
 let debounceTimer = null;
 
-function measureCharWidth() {
-  const style = getComputedStyle(textareaEl);
-  const span = document.createElement('span');
-  span.style.cssText = `visibility:hidden;position:absolute;white-space:pre;font-family:${style.fontFamily};font-size:${style.fontSize};`;
-  span.textContent = 'x'.repeat(20);
-  document.body.appendChild(span);
-  charWidth = span.getBoundingClientRect().width / 20;
-  span.remove();
+function initCanvasCtx() {
+  const canvas = document.createElement('canvas');
+  canvasCtx = canvas.getContext('2d');
+  canvasCtx.font = getComputedStyle(textareaEl).font;
 }
 
 export function initEditor({ textarea, gutterContent, onSave, onDelete }) {
@@ -47,7 +43,7 @@ export function initEditor({ textarea, gutterContent, onSave, onDelete }) {
   });
   window.addEventListener('resize', refreshGutter);
 
-  measureCharWidth();
+  initCanvasCtx();
   refreshGutter();
 }
 
@@ -153,14 +149,12 @@ async function flushNow() {
 
 function refreshGutter() {
   const lines = textareaEl.value.split('\n');
-  const visibleCols = charWidth > 0
-    ? Math.floor((textareaEl.clientWidth - TEXTAREA_H_PADDING) / charWidth)
-    : Infinity;
+  const availableWidth = textareaEl.clientWidth - TEXTAREA_H_PADDING;
 
   let html = '';
   for (let i = 0; i < lines.length; i++) {
-    const marker = lines[i].length > visibleCols ? '›' : '';
-    html += `<div data-long="${marker}"><span class="num">${i + 1}</span></div>`;
+    const isLong = canvasCtx && canvasCtx.measureText(lines[i]).width > availableWidth;
+    html += `<div data-long="${isLong ? '›' : ''}"><span class="num">${i + 1}</span></div>`;
   }
 
   if (html === lastGutterHtml) return;
