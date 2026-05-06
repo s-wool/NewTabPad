@@ -38,9 +38,42 @@ icons/
 ### 採用: `<textarea>` + 別 div の行番号ガター
 
 - 本文は `<textarea wrap="off">`、左側に `<div class="gutter">` を置く
-- 行番号は textarea の値に応じて再生成（行数が変わったときのみ DOM を更新）
+- 行番号は textarea の値に応じて再生成。`input` イベントのたびに更新する
+  - 行数が変わらなくても行の長さが変わる可能性があるため、毎回チェックする
 - gutter は textarea の `scroll` イベントで `scrollTop` を同期する
   - 横スクロールは無視（行番号列は固定のまま）
+
+### 長行マーカー（`›`）
+
+画面幅を超えている行の行番号右側に `›` を表示する。
+
+**文字幅の計測:**
+
+モノスペースフォントは全文字が同じ幅を持つため、初期化時に1文字分の幅を一度だけ計測する。
+
+```js
+function measureCharWidth() {
+  const span = document.createElement('span');
+  span.style.cssText = 'visibility:hidden; position:absolute; white-space:pre;';
+  // textarea と同じフォント設定を適用
+  span.textContent = 'x'.repeat(20);
+  document.body.appendChild(span);
+  const w = span.getBoundingClientRect().width / 20;
+  span.remove();
+  return w;
+}
+```
+
+**判定:**
+
+```js
+const padding = 32; // textarea の左右 padding 合計 (px)
+const visibleCols = Math.floor((textareaEl.clientWidth - padding) / charWidth);
+const isLong = line.length > visibleCols;
+```
+
+- `textarea.clientWidth` はウィンドウリサイズで変わるため、`resize` イベントで `visibleCols` を再計算する
+- タブ文字（`\t`）は1文字としてカウントする（簡略化）
 
 ### 折り返しは行わない
 
