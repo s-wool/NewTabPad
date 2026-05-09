@@ -21,7 +21,7 @@ A Chrome extension that replaces the new tab page with a plain-text notepad.
 
 ### From Chrome Web Store
 
-*(coming soon)*
+https://chromewebstore.google.com/detail/fheahjkhknoainbllbkijhmjknhbfkme?utm_source=item-share-cb
 
 ## Keyboard Shortcuts
 
