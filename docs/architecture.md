@@ -12,26 +12,33 @@
   - `storage`
   - `unlimitedStorage`
 
-## ファイル構成（予定）
+## ファイル構成
 
 ```
 manifest.json
 newtab.html
+package.json        # Vitest 依存とパッケージスクリプト
+vitest.config.js
 src/
   main.js          # 起動時のエントリポイント、画面遷移の調整
   editor.js        # textarea + 行番号ガター + IME 保留
   list.js          # 一覧画面の描画
   storage.js       # chrome.storage.local の薄いラッパ
-  sync.js          # chrome.storage.onChanged の購読、sourceTabId 管理
+  sync.js          # myTabId・computeSyncAction
   shortcuts.js     # キーボードショートカット
   utils.js         # 日付フォーマット、プレビュー生成、空判定
 styles/
   newtab.css
 icons/
   16.png 32.png 48.png 128.png
+scripts/
+  package.sh       # Chrome Web Store 提出用 ZIP 生成
+test/
+  setup.js         # Vitest グローバルセットアップ（chrome モック）
+  utils.test.js
+  sync.test.js
+  editor.test.js
 ```
-
-ファイル分割の粒度は実装時に微調整してよい。同期と保存は密結合になりやすいので一体化する選択もあり得る。
 
 ## エディタ実装
 
@@ -225,10 +232,33 @@ keystroke
 - ユーザ向けの UI エラー表示はしない
 - 例外を握り潰さない（開発時に気付けるようにする）
 
+## テスト方針
+
+### フレームワーク
+
+Vitest + jsdom。ビルドプロセスなしの方針と整合するため、ES modules をそのまま扱える最小構成を選択。
+
+### テスト対象
+
+手動確認が困難なロジックに限定して自動テストを追加する。
+
+| 対象 | 理由 |
+|---|---|
+| `utils.js`（`isEmpty`、`formatDate`、`getPreview`） | 純粋関数。エッジケースが多く、変更時の回帰を検知しやすい |
+| クロスタブ同期の判定ロジック（`sync.js` に抽出） | `sourceTabId` フィルタ・削除・更新の判定。バグがデータ損失に直結する |
+| `editor.js` の IME 保留挙動 | `compositionstart`〜`compositionend` 中の外部更新保留は手動確認が難しい |
+
+### テストしないもの
+
+- `chrome.storage` の実際の読み書き（Chrome API 統合）
+- タブ間の実際の同期（ブラウザ上の E2E 動作）
+- UI の描画・レイアウト
+
+これらは CLAUDE.md の手動確認観点で引き続き対応する。
+
 ## v1 で意図的にやらないこと
 
 - ビルドツール／TypeScript／フレームワーク導入
-- 単体テスト（手動確認のみ）
 - リッチテキスト編集
 - 検索／タグ／カテゴリ
 - リモート同期
