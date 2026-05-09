@@ -5,7 +5,7 @@ import {
 import { initList, showList, hideList, refreshList, isListVisible } from './list.js';
 import { initShortcuts } from './shortcuts.js';
 import { loadNotes, writeNotes, subscribeChanges } from './storage.js';
-import { myTabId } from './sync.js';
+import { myTabId, computeSyncAction } from './sync.js';
 import { isEmpty } from './utils.js';
 
 let notesCache = {};
@@ -120,22 +120,18 @@ function handleEscape() {
 }
 
 async function handleStorageChange(changes) {
-  const sync = changes.__sync?.newValue;
-  if (sync?.sourceTabId === myTabId) return;
-
-  if (!changes.notes) return;
-  const newNotes = changes.notes.newValue ?? {};
-  const oldNotes = changes.notes.oldValue ?? {};
-  notesCache = newNotes;
-
   const currentId = getCurrentNoteId();
-  if (currentId) {
-    if (oldNotes[currentId] && !newNotes[currentId]) {
-      applyExternalDelete(currentId);
-      await openNote(findLatest(), { focus: false });
-    } else if (newNotes[currentId] && newNotes[currentId].content !== oldNotes[currentId]?.content) {
-      applyExternalUpdate(newNotes[currentId]);
-    }
+  const action = computeSyncAction(changes, currentId, myTabId);
+
+  if (action.type === 'ignore') return;
+
+  notesCache = changes.notes.newValue ?? {};
+
+  if (action.type === 'deleted') {
+    applyExternalDelete(currentId);
+    await openNote(findLatest(), { focus: false });
+  } else if (action.type === 'updated') {
+    applyExternalUpdate(action.note);
   }
 
   refreshList(notesCache);
