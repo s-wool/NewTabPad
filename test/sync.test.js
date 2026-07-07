@@ -1,5 +1,24 @@
 import { describe, test, expect } from 'vitest';
-import { computeSyncAction } from '../src/sync.js';
+import { myTabId, makeSyncMeta, computeSyncAction } from '../src/sync.js';
+
+describe('makeSyncMeta', () => {
+  test('sourceTabId と noteId を含む', () => {
+    const meta = makeSyncMeta('note-1');
+    expect(meta.sourceTabId).toBe(myTabId);
+    expect(meta.noteId).toBe('note-1');
+  });
+
+  // chrome.storage.onChanged は値が変化しなかったキーを changes に含めないため、
+  // 同じメモを連続保存しても __sync の値は毎回変わらなければならない。
+  // これが同一だと自タブ判定がすり抜け、自分の保存で自分のエディタが
+  // 上書きされてカーソルが末尾に飛ぶ（回帰: カーソル移動バグ）。
+  test('同じ noteId で連続して呼んでも毎回異なる値を返す', () => {
+    const first = makeSyncMeta('note-1');
+    const second = makeSyncMeta('note-1');
+    expect(second).not.toEqual(first);
+    expect(second.seq).toBeGreaterThan(first.seq);
+  });
+});
 
 describe('computeSyncAction', () => {
   test('自タブ発の変更は ignore を返す', () => {

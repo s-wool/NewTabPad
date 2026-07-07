@@ -5,7 +5,7 @@ import {
 import { initList, showList, hideList, refreshList, isListVisible } from './list.js';
 import { initShortcuts } from './shortcuts.js';
 import { loadNotes, writeNotes, subscribeChanges } from './storage.js';
-import { myTabId, computeSyncAction } from './sync.js';
+import { myTabId, makeSyncMeta, computeSyncAction } from './sync.js';
 import { isEmpty } from './utils.js';
 
 let notesCache = {};
@@ -72,7 +72,7 @@ async function handleEditorDelete(noteId) {
 
 async function persistAll(noteId) {
   try {
-    await writeNotes(notesCache, { sourceTabId: myTabId, noteId });
+    await writeNotes(notesCache, makeSyncMeta(noteId));
   } catch (err) {
     console.error('NewTabPad: storage write failed', err);
   }
