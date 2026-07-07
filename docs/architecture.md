@@ -145,11 +145,13 @@ type Notes = {
 type Sync = {
   sourceTabId: string;   // 書き込み元タブの一時 ID（メモリのみ）
   noteId: string;        // 編集対象のメモ ID
+  seq: number;           // タブ内で書き込みごとに増加するカウンタ
 };
 ```
 
 - 同期目的のメタデータのみ。データ本体（`notes`）を汚さないため別キーに分離
 - 1 回の `chrome.storage.local.set({ notes, __sync })` で書き込むため、`onChanged` も両キーまとめて 1 回で届く
+- `seq` は `__sync` の値が書き込みごとに必ず変化することを保証するためのもの。`chrome.storage.onChanged` は**値が実際に変化したキーしか `changes` に含めない**ため、`seq` がないと同一タブで同じメモを保存し続けたとき（2 回目以降は `sourceTabId` も `noteId` も同じ）`__sync` が `changes` から落ち、自タブ判定がすり抜けて自分の保存が自分のエディタを上書きする（カーソルが末尾に飛ぶ）
 
 ### 持たないもの
 
